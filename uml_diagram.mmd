@@ -1,0 +1,126 @@
+classDiagram
+    direction TB
+
+    class PatientRecord {
+        <<Abstract>>
+        #string patientId
+        #string name
+        #int age
+        #string contactInfo
+        #vector~Appointment~ appointments
+        +getPatientCategory()* string
+        +getPriorityLevel()* string
+        +getId() string
+        +getName() string
+        +getAge() int
+        +getContactInfo() string
+        +setName(string) void
+        +setAge(int) void
+        +setContactInfo(string) void
+        +addAppointment(Appointment) void
+        +getAppointments() vector~Appointment~
+    }
+
+    class Appointable {
+        <<Interface>>
+        +scheduleAppointment(date, time, reason)* bool
+        +cancelAppointment(appointmentId)* bool
+    }
+
+    class GeneralPatient {
+        +scheduleAppointment(date, time, reason) bool
+        +cancelAppointment(appointmentId) bool
+        +getPatientCategory() string
+        +getPriorityLevel() string
+    }
+
+    class EmergencyPatient {
+        -int severityLevel
+        +getPatientCategory() string
+        +getPriorityLevel() string
+        +getSeverityLevel() int
+    }
+
+    class FollowUpPatient {
+        -string previousDoctor
+        +scheduleAppointment(date, time, reason) bool
+        +cancelAppointment(appointmentId) bool
+        +getPatientCategory() string
+        +getPriorityLevel() string
+    }
+
+    class Appointment {
+        -string appointmentId
+        -string date
+        -string time
+        -string reason
+        +getId() string
+        +getDate() string
+        +getTime() string
+        +getReason() string
+    }
+
+    class DuplicatePatientException {
+        <<Exception>>
+        -string message
+        +what() const char*
+    }
+
+    class ClinicDatabase {
+        -vector~shared_ptr~PatientRecord~~ patientRegistry
+        -queue~string~ waitingQueue
+        -stack~AdminAction~ undoStack
+        -shared_ptr~PatientRecord~ recentCache[10]
+        -size_t cacheCount
+        +addPatient(shared_ptr~PatientRecord~) void
+        +editPatient(id, name, age, contact, recordUndo) bool
+        +deletePatient(id, recordUndo) bool
+        +undoLastOperation() void
+        +clearAll() void
+        +enqueuePatient(id) void
+        +dequeueNextPatient() string
+        +updateCache(shared_ptr~PatientRecord~) void
+        +getRecentCacheList() vector~shared_ptr~PatientRecord~~
+        +getAllPatients() vector~shared_ptr~PatientRecord~~
+    }
+
+    class SearchEngine {
+        +linearSearchById(list, targetId)$ int
+        +binarySearchById(sortedList, targetId)$ int
+        +recursiveSearchByName(list, targetName, index)$ int
+    }
+
+    class SortEngine {
+        +selectionSort(list, criteria)$ void
+        +quickSort(list, criteria)$ void
+    }
+
+    class FileHandler {
+        +savePatientsToCSV(patients, filename)$ bool
+        +loadPatientsFromCSV(filename)$ vector~shared_ptr~PatientRecord~~
+    }
+
+    class MainWindow {
+        -ClinicDatabase clinicDb
+        -PatientPanel* patientTab
+        -AppointmentPanel* appointmentTab
+        -QueuePanel* queueTab
+        -SearchSortPanel* searchSortTab
+        -QTimer* dashboardTimer
+        +setupTabs() void
+        +setupMenuAndShortcuts() void
+        +setupTimer() void
+    }
+
+    PatientRecord <|-- GeneralPatient : Inheritance
+    PatientRecord <|-- EmergencyPatient : Inheritance
+    PatientRecord <|-- FollowUpPatient : Inheritance
+    Appointable <|.. GeneralPatient : Realizes
+    Appointable <|.. FollowUpPatient : Realizes
+    PatientRecord *-- "0..*" Appointment : Composition
+    ClinicDatabase o-- "0..*" PatientRecord : Aggregation
+    ClinicDatabase ..> DuplicatePatientException : Throws
+    MainWindow *-- ClinicDatabase : Composition
+    MainWindow ..> SearchEngine : Uses
+    MainWindow ..> SortEngine : Uses
+    MainWindow ..> FileHandler : Uses

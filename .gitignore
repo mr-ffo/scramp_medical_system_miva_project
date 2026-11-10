@@ -1,0 +1,16 @@
+# CMake & Build Artifacts
+build/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+compile_commands.json
+SCAPMS
+*_autogen/
+
+# IDE & OS files
+.vscode/
+.idea/
+*.user
+*.swp
+*~
