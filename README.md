@@ -294,3 +294,4 @@ cmake --build build --config Debug --target all -j 4
 | **`Ctrl + L`** | Load patient and appointment records from CSV |
 | **`Ctrl + F`** | Jump to the Search & Sort tab and focus the search bar |
 | **`Ctrl + Q`** | Exit the application |
+
